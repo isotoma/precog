@@ -52,3 +52,14 @@ changes. We then run `isort`, add the file, then pop the stash.
 There are almost certainly edge-cases in this, and if it mucks up your
 commit, then I am sorry. Out of your sadness, a PR/issue can rise to
 make it not happen again.
+
+Integration with `eslint`
+=========================
+
+To lint your JavaScript, precog will invoke eslint on any changed
+`.js` files. Because it is not a Python dependency, installing precog
+makes no attempt to install eslint, but will try to find it at
+`node_modules/.bin/eslint`. If it doesn't find it, it will assume it
+is installed globally. You can set the `ESLINT_PATH` environment
+variable if this doesn't find it - if so you may want to set it as a
+default in your pre-commit file.
