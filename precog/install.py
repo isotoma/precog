@@ -27,7 +27,7 @@ import precog
 # The default for all the other *_STRICT values
 STRICT = os.getenv('STRICT', True)
 
-FLAKE8_COMPLEXITY = os.getenv('FLAKE8_COMPLEXITY')
+FLAKE8_COMPLEXITY = os.getenv('FLAKE8_COMPLEXITY', -1)
 FLAKE8_STRICT = os.getenv('FLAKE8_STRICT', STRICT)
 FLAKE8_IGNORE = os.getenv('FLAKE8_IGNORE')
 FLAKE8_LAZY = os.getenv('FLAKE8_LAZY', False)
