@@ -1,0 +1,15 @@
+language: python
+python:
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+
+sudo: false
+
+before_script:
+  - flake8 precog tests.py setup.py
+  - isort --recursive --check-only precog tests.py setup.py
+
+script:
+  - python setup.py test
