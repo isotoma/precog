@@ -12,11 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import unicode_literals
+
 from unittest import TestCase
 
 import mock
 
 from precog import isort_git_hook, stash_unstaged
+from precog.options import Options
+
+try:
+    from io import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 
 class TestStashUntaged(TestCase):
@@ -258,3 +266,80 @@ class TestIsortGitHook(TestCase):
         assert m_stash_unstaged.called_with(is_needed=True)
 
         assert errors == 0
+
+
+class TestOptions(TestCase):
+
+    def test_defaults(self):
+        opts = Options(
+            environment_vars={},
+            precommit_defaults={})
+        self.assertEqual(
+            opts.get_kwargs('flake8_'),
+            dict(complexity=-1,
+                 lazy=False,
+                 strict=True))
+        self.assertEqual(
+            opts.get_kwargs('isort_'),
+            dict(force=False,
+                 strict=True))
+        self.assertEqual(
+            opts.get_kwargs('eslint_'),
+            dict(strict=True))
+
+    def test_precommit_kwargs_overrides_defaults(self):
+        opts = Options(
+            environment_vars={},
+            precommit_defaults=dict(flake8_complexity=8))
+        self.assertEqual(opts.get_kwargs('flake8_')['complexity'], 8)
+
+    def test_environment_vars_overrides_precommit_kwargs(self):
+        opts = Options(
+            environment_vars=dict(flake8_complexity=8),
+            precommit_defaults=dict(flake8_complexity=15))
+        self.assertEqual(opts.get_kwargs('flake8_')['complexity'], 8)
+
+    def test_environment_vars_overrides_defaults(self):
+        opts = Options(
+            environment_vars=dict(flake8_complexity=8),
+            precommit_defaults={})
+        self.assertEqual(opts.get_kwargs('flake8_')['complexity'], 8)
+
+    def test_strict_fallback(self):
+        opts = Options(
+            environment_vars=dict(strict=False),
+            precommit_defaults={})
+        # Should find the value from strict for default.
+        self.assertEqual(opts.get_kwargs('flake8_')['strict'], False)
+        self.assertEqual(opts.get_kwargs('isort_')['strict'], False)
+        self.assertEqual(opts.get_kwargs('eslint_')['strict'], False)
+
+    def test_strict_fallback_overrides(self):
+        opts = Options(
+            environment_vars=dict(flake8_strict=True),
+            precommit_defaults=dict(strict=False))
+        # Should find the value from strict for default, except if
+        # overridden.
+        self.assertEqual(opts.get_kwargs('flake8_')['strict'], True)
+        self.assertEqual(opts.get_kwargs('isort_')['strict'], False)
+        self.assertEqual(opts.get_kwargs('eslint_')['strict'], False)
+
+    def test_strict_type_conversion(self):
+        opts = Options(
+            environment_vars={},
+            precommit_defaults=dict(flake8_complexity='8'))
+        self.assertEqual(opts.get_kwargs('flake8_')['complexity'], 8)
+
+    def test_strict_type_conversion_failure_and_fallback(self):
+        opts = Options(
+            environment_vars={},
+            precommit_defaults=dict(flake8_complexity='invalid'))
+        with mock.patch('sys.stderr', new_callable=StringIO) as m_stderr:
+            self.assertEqual(opts.get_kwargs('flake8_')['complexity'], -1)
+        self.assertEqual(m_stderr.getvalue(), 'Invalid value for flake8_complexity. Ignoring.\n')
+
+    def test_strict_type_conversion_failure_and_fallback_with_none(self):
+        opts = Options(
+            environment_vars={},
+            precommit_defaults=dict(flake8_complexity=None))
+        self.assertEqual(opts.get_kwargs('flake8_')['complexity'], -1)

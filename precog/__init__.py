@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import contextlib
 import os
@@ -24,9 +24,11 @@ from flake8.hooks import git_hook as flake8_git_hook
 from isort import SortImports
 from isort.hooks import get_lines, get_output
 
+from precog.options import Options
+
 
 def _datetime_token():
-    return datetime.now().isoformat(' ')
+    return datetime.now().isoformat(str(' '))
 
 
 @contextlib.contextmanager
@@ -60,12 +62,12 @@ def stash_unstaged(is_needed):
                     ctx.success = False
                 break
         else:
-            print('No matching stash found.')
+            print('No matching stash found.', file=sys.stderr)
 
 
 # Copy of git_hook from isort.hooks, but altered to force actual
 # updating of the imports.
-def isort_git_hook(strict=False, force=True):
+def isort_git_hook(strict=False, force=False):
     """
     Git pre-commit hook to check staged files for isort errors
     :param bool strict - if True, return number of errors on exit,
@@ -108,8 +110,8 @@ def isort_git_hook(strict=False, force=True):
         # The stash was messy, but we should not error. We want the
         # commit to be complete. If we have left the current working
         # copy in a mess, then that's OK.
-        print('### Error: stash did not pop cleanly ###')
-        print('### Working copy may have unresolved merges ###')
+        print('### Error: stash did not pop cleanly ###', file=sys.stderr)
+        print('### Working copy may have unresolved merges ###', file=sys.stderr)
     elif force:
         # Because of the stash-unstash, we will be left in a state of
         # unsorted imports, so sort them now, but only if the stash-pop
@@ -156,14 +158,13 @@ def eslint(path=None, strict=False):
     return 0
 
 
-def kwargs_remove_prefix(kwargs, prefix):
-    return {k[len(prefix):]: v for k, v in kwargs.items() if k.startswith(prefix)}
-
-
 def hook(**kwargs):
-    flake8_kwargs = kwargs_remove_prefix(kwargs, 'flake8_')
-    isort_kwargs = kwargs_remove_prefix(kwargs, 'isort_')
-    eslint_kwargs = kwargs_remove_prefix(kwargs, 'eslint_')
+    options = Options(os.environ, kwargs)
+
+    flake8_kwargs = options.get_kwargs('flake8_')
+    isort_kwargs = options.get_kwargs('isort_')
+    eslint_kwargs = options.get_kwargs('eslint_')
+
     sys.exit(
         isort_git_hook(**isort_kwargs) or
         flake8_git_hook(**flake8_kwargs) or
