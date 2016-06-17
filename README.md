@@ -33,6 +33,20 @@ To skip just isort:
 ISORT_STRICT="" git commit -m "wip - todo: fix imports"
 ```
 
+If you want to specify a change to the built-in defaults permanently,
+you can add to to the `defaults` dict in the pre-commit file. If you
+specify:
+
+```python
+defaults = {
+    `isort_strict`: False
+}
+```
+
+then run `git commit -m "message here"`, this will not restrict if
+isort fails. But you can then override this from the command line if
+you then run `ISORT_STRICT=1 git commit -m "message here"`.
+
 The `ISORT_FORCE` option
 ========================
 
@@ -63,3 +77,24 @@ makes no attempt to install eslint, but will try to find it at
 is installed globally. You can set the `ESLINT_PATH` environment
 variable if this doesn't find it - if so you may want to set it as a
 default in your pre-commit file.
+
+List of recognised options
+==========================
+
+- `STRICT`, `bool` - the default for all the other `*_STRICT` values
+
+- `FLAKE8_COMPLEXITY`, `int` - the McCabe complexity value to pass to flake8.
+
+- `FLAKE8_STRICT`, `bool` - should a flake8 error abort the commit?
+
+- `FLAKE8_IGNORE`, `str` - comma separated list of flake8-checks to ignore.
+
+- `FLAKE8_LAZY`, `bool` - allows for the instances where you don’t add the files to the index.
+
+- `ISORT_STRICT`, `bool` - should an isort error abort the commit?
+
+- `ISORT_FORCE`, `bool` - should isort fixup your commit for you?
+
+- `ESLINT_STRICT`, `bool` - should an eslint error abort the commit?
+
+- `ESLINT_PATH`, `str` - path to the eslint executable.

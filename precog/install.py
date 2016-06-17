@@ -20,33 +20,12 @@ from flake8 import hooks
 
 
 git_hook_file = '''#!/usr/bin/env python
-import os
 import precog
 
-
-# The default for all the other *_STRICT values
-STRICT = os.getenv('STRICT', True)
-
-FLAKE8_COMPLEXITY = os.getenv('FLAKE8_COMPLEXITY', -1)
-FLAKE8_STRICT = os.getenv('FLAKE8_STRICT', STRICT)
-FLAKE8_IGNORE = os.getenv('FLAKE8_IGNORE')
-FLAKE8_LAZY = os.getenv('FLAKE8_LAZY', False)
-ISORT_STRICT = os.getenv('ISORT_STRICT', STRICT)
-ISORT_FORCE = os.getenv('ISORT_FORCE', False)  # should isort rewrite your commit to fix it
-ESLINT_STRICT = os.getenv('ESLINT_STRICT', STRICT)
-ESLINT_PATH = os.getenv('ESLINT_PATH')  # path to the eslint executable
-
+defaults = dict()
 
 if __name__ == '__main__':
-    precog.hook(
-        flake8_complexity=FLAKE8_COMPLEXITY,
-        flake8_strict=FLAKE8_STRICT,
-        flake8_ignore=FLAKE8_IGNORE,
-        flake8_lazy=FLAKE8_LAZY,
-        isort_strict=ISORT_STRICT,
-        isort_force=ISORT_FORCE,
-        eslint_strict=ESLINT_STRICT,
-        eslint_path=ESLINT_PATH)
+    precog.hook(**defaults)
 '''
 
 
