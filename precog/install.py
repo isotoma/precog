@@ -20,21 +20,20 @@ from flake8 import hooks
 
 
 git_hook_file = '''#!/usr/bin/env python
-import os
 import precog
 
 
 # The default for all the other *_STRICT values
-STRICT = os.getenv('STRICT', True)
+STRICT = precog.getenv('STRICT', True)
 
-FLAKE8_COMPLEXITY = os.getenv('FLAKE8_COMPLEXITY', -1)
-FLAKE8_STRICT = os.getenv('FLAKE8_STRICT', STRICT)
-FLAKE8_IGNORE = os.getenv('FLAKE8_IGNORE')
-FLAKE8_LAZY = os.getenv('FLAKE8_LAZY', False)
-ISORT_STRICT = os.getenv('ISORT_STRICT', STRICT)
-ISORT_FORCE = os.getenv('ISORT_FORCE', False)  # should isort rewrite your commit to fix it
-ESLINT_STRICT = os.getenv('ESLINT_STRICT', STRICT)
-ESLINT_PATH = os.getenv('ESLINT_PATH')  # path to the eslint executable
+FLAKE8_COMPLEXITY = precog.getenv('FLAKE8_COMPLEXITY')
+FLAKE8_STRICT = precog.getenv('FLAKE8_STRICT', STRICT)
+FLAKE8_IGNORE = precog.getenv('FLAKE8_IGNORE')
+FLAKE8_LAZY = precog.getenv('FLAKE8_LAZY', False)
+ISORT_STRICT = precog.getenv('ISORT_STRICT', STRICT)
+ISORT_FORCE = precog.getenv('ISORT_FORCE', False)  # should isort rewrite your commit to fix it
+ESLINT_STRICT = precog.getenv('ESLINT_STRICT', STRICT)
+ESLINT_PATH = precog.getenv('ESLINT_PATH')  # path to the eslint executable
 
 
 if __name__ == '__main__':

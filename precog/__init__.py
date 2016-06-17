@@ -168,3 +168,33 @@ def hook(**kwargs):
         isort_git_hook(**isort_kwargs) or
         flake8_git_hook(**flake8_kwargs) or
         eslint(**eslint_kwargs))
+
+
+# A dict mapping an option to a pair of (type, fallback). The fallback
+# will be used if the value cannot be converted to the specified type.
+CUSTOM_TYPES = {
+    # It turns out that `None` is not a valid default for the
+    # complexity as of python3.
+    'FLAKE8_COMPLEXITY': (int, -1),
+}
+
+
+def getenv(key, default=None):
+    """A wrapper around os.getenv so we can tweak things to be the right
+    type.
+
+    """
+    value = os.getenv(key, default)
+
+    custom_type, fallback = CUSTOM_TYPES.get(key, (None, None))
+
+    if custom_type:
+        try:
+            return custom_type(value)
+        except ValueError:
+            print('Invalid value for {}. Ignoring.'.format(key))
+            return fallback
+        except TypeError:
+            # Then it isn't currently set, don't bother printing a
+            # message, just use the fallback.
+            return fallback
