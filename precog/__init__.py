@@ -136,6 +136,10 @@ def _find_node_modules_eslint():
     # Look for a local node_modules and use that
     node_modules = _find_dir('node_modules')
     if node_modules:
+        possible_path = os.path.join(node_modules, '.bin', 'eslint.cmd')
+        if os.path.isfile(possible_path):
+            return possible_path
+
         possible_path = os.path.join(node_modules, '.bin', 'eslint')
         if os.path.isfile(possible_path):
             return possible_path
